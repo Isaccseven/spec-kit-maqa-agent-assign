@@ -1,0 +1,31 @@
+id: maqa-agent-assign
+name: MAQA × Agent Assign Bridge
+version: 1.0.0
+description: >
+  Bridges maqa and agent-assign so that /speckit.maqa.coordinator automatically
+  runs agent-assign (assign → validate → execute) inside every feature agent,
+  instead of the default /speckit.implement. Requires both maqa (>=0.3.0) and
+  agent-assign (>=1.0.0) to be installed.
+author: Isaccseven
+license: MIT
+category: process
+effect: read-write
+
+requires:
+  speckit_version: ">=0.8.0"
+  extensions:
+    - id: maqa
+      version: ">=0.3.0"
+    - id: agent-assign
+      version: ">=1.0.0"
+
+provides:
+  commands: 3
+  hooks: 2
+
+tags:
+  - maqa
+  - agent-assign
+  - multi-agent
+  - orchestration
+  - bridge
