@@ -1,37 +1,37 @@
 ---
-description: "Prueft ob speckit.maqa und speckit.agent-assign installiert sind und installiert sie falls nicht."
+description: "Checks whether speckit.maqa and speckit.agent-assign are installed and installs them if missing."
 ---
 
 # Install Dependencies
 
-Dieser Command wird automatisch via `before_specify`-Hook (priority 1) ausgefuehrt.
-Er stellt sicher, dass beide Abhaengigkeiten vorhanden sind, bevor der Coordinator startet.
+This command is executed automatically via the `before_specify` hook (priority 1).
+It ensures both dependencies are present before the coordinator starts.
 
 ## Steps
 
 ### Step 1: Dependency Check
 
-Pruefe ob `speckit.maqa` und `speckit.agent-assign` bereits installiert sind:
+Check whether `speckit.maqa` and `speckit.agent-assign` are already installed:
 
 ```bash
 specify extension list
 ```
 
-### Step 2: Bedingte Installation
+### Step 2: Conditional Installation
 
-Werte die Ausgabe aus:
+Evaluate the output:
 
-- Wenn `maqa` **nicht** in der Liste enthalten ist:
+- If `maqa` is **not** in the list:
   ```bash
   specify extension add maqa
   ```
-- Wenn `agent-assign` **nicht** in der Liste enthalten ist:
+- If `agent-assign` is **not** in the list:
   ```bash
   specify extension add agent-assign
   ```
-- Wenn beide bereits installiert sind, gib aus:
+- If both are already installed, print:
   `[maqa-agent-assign] Dependencies already satisfied ✓`
-  und fahre sofort fort ohne weitere Aktionen.
+  and continue immediately without further action.
 
 ### Step 3: Verify
 
@@ -39,11 +39,11 @@ Werte die Ausgabe aus:
 specify extension list
 ```
 
-Bestaetige dass beide Extensions aktiv sind.
+Confirm that both extensions are now active.
 
-## Fehlerbehandlung
+## Error Handling
 
-Falls eine Installation fehlschlaegt (z.B. Catalog nicht erreichbar):
-- Gib eine Warnung aus: `[maqa-agent-assign] WARN: Could not install {name}, falling back to /speckit.implement`
-- Fahre trotzdem fort – der Coordinator greift auf `/speckit.implement` zurueck
-- Blockiere den Workflow **nicht**
+If an installation fails (e.g. catalog unreachable):
+- Print a warning: `[maqa-agent-assign] WARN: Could not install {name}, falling back to /speckit.implement`
+- Continue anyway — the coordinator falls back to `/speckit.implement`
+- **Do not block** the workflow

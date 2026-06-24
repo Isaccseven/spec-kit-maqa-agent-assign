@@ -4,7 +4,7 @@ extension:
   id: maqa-agent-assign
   name: MAQA + Agent Assign Bridge
   version: 1.1.0
-  description: "Kombiniert speckit.maqa und speckit.agent-assign – installiert Abhaengigkeiten automatisch."
+  description: "Bridges speckit.maqa and speckit.agent-assign — installs dependencies automatically."
   author: Isaccseven
   repository: https://github.com/Isaccseven/spec-kit-maqa-agent-assign
   license: MIT
@@ -16,36 +16,36 @@ provides:
   commands:
     - name: speckit.maqa-aa.install-deps
       file: commands/install-deps.md
-      description: "Prueft und installiert speckit.maqa + speckit.agent-assign automatisch"
+      description: "Checks and installs speckit.maqa + speckit.agent-assign automatically"
 
     - name: speckit.maqa-aa.coordinator
       file: commands/coordinator.md
-      description: "MAQA Coordinator mit automatischem Agent-Assign"
+      description: "MAQA Coordinator with automatic Agent-Assign"
 
     - name: speckit.maqa-aa.scaffold-agents
       file: commands/scaffold-agents.md
-      description: "Generiert Agent-Files basierend auf dem Projekt-Stack"
+      description: "Detects the project stack and generates matching Agent-Files"
 
     - name: speckit.maqa-aa.status
       file: commands/status.md
-      description: "Unified Status Dashboard fuer MAQA + Agent-Assign"
+      description: "Unified Status Dashboard for MAQA + Agent-Assign"
 
-# Der before_specify Hook laueft einmalig beim ersten Projektstart.
-# priority: 1 stellt sicher, dass er vor allen anderen Hooks ausgefuehrt wird.
+# The before_specify hook runs once on the first project start.
+# priority: 1 ensures it runs before all other hooks.
 hooks:
   before_specify:
     command: speckit.maqa-aa.install-deps
     priority: 1
     optional: true
-    prompt: "MAQA + Agent-Assign Dependencies pruefen/installieren?"
-    description: "Stellt sicher dass speckit.maqa und speckit.agent-assign installiert sind"
+    prompt: "Check and install MAQA + Agent-Assign dependencies?"
+    description: "Ensures that speckit.maqa and speckit.agent-assign are installed"
     condition: null
 
   after_tasks:
     command: speckit.maqa-aa.coordinator
     priority: 10
     optional: false
-    description: "Automatisches Agent-Assign nach Task-Generierung"
+    description: "Automatic Agent-Assign after task generation"
 
 tags:
   - maqa

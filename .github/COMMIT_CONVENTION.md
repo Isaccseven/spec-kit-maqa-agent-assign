@@ -1,6 +1,6 @@
 # Commit Convention
 
-Dieses Repo nutzt [Conventional Commits](https://www.conventionalcommits.org/) + [Semantic Release](https://semantic-release.gitbook.io/).
+This repo uses [Conventional Commits](https://www.conventionalcommits.org/) + [Semantic Release](https://semantic-release.gitbook.io/).
 
 ## Format
 
@@ -12,20 +12,20 @@ Dieses Repo nutzt [Conventional Commits](https://www.conventionalcommits.org/) +
 [optional footer]
 ```
 
-## Typen & Release-Auswirkung
+## Types & Release Impact
 
-| Typ | Beschreibung | Release |
+| Type | Description | Release |
 |---|---|---|
-| `feat` | Neues Feature | `minor` (1.x.0) |
-| `fix` | Bugfix | `patch` (1.0.x) |
-| `perf` | Performance-Verbesserung | `patch` |
-| `refactor` | Refactoring ohne Feature/Fix | `patch` |
-| `revert` | Revert eines Commits | `patch` |
-| `docs` | Nur Dokumentation | kein Release |
-| `style` | Formatierung, Leerzeichen | kein Release |
-| `test` | Tests hinzufügen/ändern | kein Release |
-| `chore` | Wartung, Dependencies | kein Release |
-| `ci` | CI-Konfiguration | kein Release |
+| `feat` | New feature | `minor` (1.x.0) |
+| `fix` | Bug fix | `patch` (1.0.x) |
+| `perf` | Performance improvement | `patch` |
+| `refactor` | Refactoring without feature/fix | `patch` |
+| `revert` | Revert a commit | `patch` |
+| `docs` | Documentation only | no release |
+| `style` | Formatting, whitespace | no release |
+| `test` | Add or update tests | no release |
+| `chore` | Maintenance, dependencies | no release |
+| `ci` | CI configuration | no release |
 
 ## Breaking Changes → Major Release
 
@@ -35,9 +35,9 @@ feat!: remove deprecated coordinator command
 BREAKING CHANGE: /speckit.maqa-aa.coordinator signature changed
 ```
 
-Oder mit `!` nach dem Typ — beides löst ein **major** Release aus.
+Either the `!` suffix after the type or a `BREAKING CHANGE:` footer triggers a **major** release.
 
-## Beispiele
+## Examples
 
 ```bash
 git commit -m "feat(coordinator): add parallel agent execution"

@@ -1,10 +1,10 @@
 ---
-description: "Zeigt ein unified Status-Dashboard fuer MAQA + Agent-Assign."
+description: "Shows a unified status dashboard for MAQA + Agent-Assign."
 ---
 
 # Status Dashboard
 
-Zeigt den aktuellen Status beider Extensions in einer Uebersicht.
+Displays the current status of both extensions in a single overview.
 
 ## Steps
 
@@ -14,32 +14,32 @@ Zeigt den aktuellen Status beider Extensions in einer Uebersicht.
 specify extension list
 ```
 
-Markiere `maqa` und `agent-assign` als ✓ (installiert) oder ✗ (fehlt).
+Mark `maqa` and `agent-assign` as ✓ (installed) or ✗ (missing).
 
 ### Step 2: Agent Assignments
 
 ```bash
-ls .specify/agents/ 2>/dev/null || echo "Keine Agent-Files gefunden – fuehre /speckit.maqa-aa.scaffold-agents aus"
+ls .specify/agents/ 2>/dev/null || echo "No agent files found — run /speckit.maqa-aa.scaffold-agents"
 ```
 
 ### Step 3: Hook Status
 
-Zeige aktive Hooks:
+Show active hooks:
 
 ```bash
 specify extension list --verbose 2>/dev/null || specify extension list
 ```
 
-Bestaetige dass `before_specify` (install-deps) und `after_tasks` (coordinator) registriert sind.
+Confirm that `before_specify` (install-deps) and `after_tasks` (coordinator) are registered.
 
 ### Step 4: Summary
 
-Gib eine kompakte Zusammenfassung aus:
+Print a compact summary:
 
 ```
 [maqa-agent-assign] Status
   speckit.maqa:          ✓ / ✗
   speckit.agent-assign:  ✓ / ✗
-  Agent-Files:           N gefunden
-  Hooks aktiv:           before_specify, after_tasks
+  Agent files:           N found
+  Active hooks:          before_specify, after_tasks
 ```

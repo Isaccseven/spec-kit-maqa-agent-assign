@@ -1,11 +1,11 @@
 ---
-description: "MAQA Coordinator mit automatischem Agent-Assign. Ersetzt /speckit.maqa.coordinator."
+description: "MAQA Coordinator with automatic Agent-Assign. Replaces /speckit.maqa.coordinator."
 ---
 
 # MAQA + Agent Assign Coordinator
 
-Dieser Command kombiniert `/speckit.maqa.coordinator` und `/speckit.agent-assign.assign`.
-Agent-Assignments werden automatisch ausgefuehrt, ohne manuellen Aufruf.
+This command combines `/speckit.maqa.coordinator` and `/speckit.agent-assign.assign`.
+Agent assignments are executed automatically without any manual invocation.
 
 ## User Input
 
@@ -15,37 +15,37 @@ $ARGUMENTS
 
 ### Step 1: Agent Assignment
 
-Fuehre automatisch aus:
+Automatically execute:
 ```
 /speckit.agent-assign.assign
 ```
-Danach:
+Then:
 ```
 /speckit.agent-assign.validate
 ```
 
-Falls `speckit.agent-assign` nicht verfuegbar ist, ueberspringe diesen Schritt und logge:
+If `speckit.agent-assign` is not available, skip this step and log:
 `[maqa-agent-assign] agent-assign unavailable, skipping assignment`
 
 ### Step 2: MAQA Coordinator
 
-Fuehre aus:
+Execute:
 ```
 /speckit.maqa.coordinator
 ```
 
-Mit den validierten Assignments aus Step 1 als Kontext.
+Using the validated assignments from Step 1 as context.
 
 ### Step 3: Feature Execution
 
-Fuer jeden Feature-Agent:
-1. `/speckit.agent-assign.assign` fuer diesen spezifischen Feature-Scope
+For each feature agent:
+1. `/speckit.agent-assign.assign` for this specific feature scope
 2. `/speckit.agent-assign.validate`
-3. `/speckit.implement` (oder den vom MAQA Coordinator vorgegebenen Command)
-4. MAQA QA-Check
+3. `/speckit.implement` (or the command specified by the MAQA Coordinator)
+4. MAQA QA check
 
 ## Fallback
 
-Wenn `speckit.maqa` nicht verfuegbar ist:
-- Logge: `[maqa-agent-assign] WARN: speckit.maqa unavailable, falling back to /speckit.implement`
-- Fuehre direkt `/speckit.implement` aus
+If `speckit.maqa` is not available:
+- Log: `[maqa-agent-assign] WARN: speckit.maqa unavailable, falling back to /speckit.implement`
+- Execute `/speckit.implement` directly

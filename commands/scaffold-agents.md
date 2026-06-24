@@ -1,16 +1,16 @@
 ---
-description: "Erkennt den Projekt-Stack automatisch und generiert passende Agent-Files fuer speckit.agent-assign."
+description: "Automatically detects the project stack and generates matching Agent-Files for speckit.agent-assign."
 ---
 
 # Scaffold Agents
 
-Dieser Command analysiert das Projekt und erstellt Agent-Definitionen die zu deinem Stack passen.
+This command analyses the project and creates agent definitions that match your stack.
 
 ## Steps
 
 ### Step 1: Stack Detection
 
-Analysiere das Projekt-Root:
+Analyse the project root:
 
 ```bash
 ls -la
@@ -20,17 +20,17 @@ cat build.gradle 2>/dev/null || true
 ls k8s/ 2>/dev/null || ls kubernetes/ 2>/dev/null || true
 ```
 
-### Step 2: Agent-Files generieren
+### Step 2: Generate Agent Files
 
-Erstelle `.specify/agents/` mit passenden Agent-Definitionen basierend auf dem erkannten Stack:
+Create `.specify/agents/` with matching agent definitions based on the detected stack:
 
 - **TypeScript/Next.js** → `frontend-agent.yml`
 - **Java/Spring** → `backend-agent.yml`
 - **K8s/Helm** → `infra-agent.yml`
 - **Jest/JUnit** → `test-agent.yml`
 
-Jedes Agent-File folgt dem Format von `speckit.agent-assign`.
+Each agent file follows the format required by `speckit.agent-assign`.
 
 ### Step 3: Confirm
 
-Gib eine Uebersicht der erstellten Agent-Files aus und erklaere welche Assignments sie ermoeglichen.
+Print a summary of the created agent files and explain which assignments they enable.
