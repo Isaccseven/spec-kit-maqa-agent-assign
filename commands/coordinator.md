@@ -1,92 +1,51 @@
 ---
-id: speckit.maqa-aa.coordinator
-description: >
-  Drop-in replacement for /speckit.maqa.coordinator.
-  Runs the MAQA coordinator and injects agent-assign into every spawned
-  feature agent instead of /speckit.implement.
+description: "MAQA Coordinator mit automatischem Agent-Assign. Ersetzt /speckit.maqa.coordinator."
 ---
 
-# MAQA × Agent Assign — Coordinator
+# MAQA + Agent Assign Coordinator
 
-You are running the combined MAQA + Agent Assign coordinator.
+Dieser Command kombiniert `/speckit.maqa.coordinator` und `/speckit.agent-assign.assign`.
+Agent-Assignments werden automatisch ausgefuehrt, ohne manuellen Aufruf.
 
-## Step 1 — Pre-flight check
+## User Input
 
-Confirm both extensions are active:
-- `maqa` installed → `.specify/extensions/maqa/` exists
-- `agent-assign` installed → `.specify/extensions/agent-assign/` exists
-- At least one agent definition exists in `.claude/agents/` or `~/.claude/agents/`
+$ARGUMENTS
 
-If agent definitions are missing, warn the user and suggest running
-`/speckit.maqa-aa.scaffold-agents` first. Do not abort — fall back to
-`default` agent for all tasks if no agents exist.
+## Steps
 
-## Step 2 — Read feature state (identical to /speckit.maqa.coordinator)
+### Step 1: Agent Assignment
 
-Read `.maqa/state.json` (or the configured board companion) to identify
-all features and their current state:
-  `todo` → `in_progress` → `in_review` → `done`
-
-Respect declared dependencies: a feature only starts when all deps are `done`.
-
-## Step 3 — Select the next unblocked batch
-
-Pick up to `max_parallel` (default: 3) features that are `todo` and have
-all deps resolved. Mark them `in_progress`.
-
-## Step 4 — SPAWN feature agents with agent-assign baked in
-
-For each selected feature, create an isolated git worktree and spawn a
-feature agent using the following injected instruction template:
-
----
-**INJECTED FEATURE AGENT INSTRUCTIONS**
-
-You are a MAQA feature agent for: `{{ feature.id }}` — {{ feature.title }}
-
-Your spec artifacts are in: `specs/{{ feature.id }}/`
-
-Do NOT run `/speckit.implement`. Instead, run the full agent-assign pipeline:
-
+Fuehre automatisch aus:
 ```
 /speckit.agent-assign.assign
+```
+Danach:
+```
 /speckit.agent-assign.validate
-/speckit.agent-assign.execute
 ```
 
-After execution is complete, run the MAQA QA gate:
+Falls `speckit.agent-assign` nicht verfuegbar ist, ueberspringe diesen Schritt und logge:
+`[maqa-agent-assign] agent-assign unavailable, skipping assignment`
+
+### Step 2: MAQA Coordinator
+
+Fuehre aus:
 ```
-/speckit.maqa.qa
+/speckit.maqa.coordinator
 ```
 
-Then report back to the coordinator with status: `done` or `blocked:<reason>`.
+Mit den validierten Assignments aus Step 1 als Kontext.
 
-If any agent definition is missing during execute, fall back to `default`
-for that task and log a warning — do not abort the feature.
----
+### Step 3: Feature Execution
 
-## Step 5 — After each feature completes
+Fuer jeden Feature-Agent:
+1. `/speckit.agent-assign.assign` fuer diesen spezifischen Feature-Scope
+2. `/speckit.agent-assign.validate`
+3. `/speckit.implement` (oder den vom MAQA Coordinator vorgegebenen Command)
+4. MAQA QA-Check
 
-The MAQA QA agent runs automatically (qa_cadence from maqa-config.yml).
-Update feature state to `in_review` once QA passes.
+## Fallback
 
-## Step 6 — Re-assess
-
-After all features in the batch reach `in_review` or `done`:
-- Merge reviewed features
-- Re-read state
-- Pick next unblocked batch
-- Repeat from Step 3 until all features are `done`
-
-## State file update
-
-After each batch completes, update `.maqa/state.json`:
-```json
-{
-  "feature_id": {
-    "state": "in_review",
-    "agent_assignments": ".specify/features/feature_id/agent-assignments.yml",
-    "worktree": "../feature_id"
-  }
-}
-```
+Wenn `speckit.maqa` nicht verfuegbar ist:
+- Logge: `[maqa-agent-assign] WARN: speckit.maqa unavailable, falling back to /speckit.implement`
+- Fuehre direkt `/speckit.implement` aus

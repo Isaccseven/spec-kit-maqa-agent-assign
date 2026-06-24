@@ -1,51 +1,45 @@
 ---
-id: speckit.maqa-aa.status
-description: >
-  Shows combined status of MAQA feature progress and agent-assign assignments
-  in a unified dashboard view.
+description: "Zeigt ein unified Status-Dashboard fuer MAQA + Agent-Assign."
 ---
 
-# MAQA × Agent Assign — Status
+# Status Dashboard
 
-Display a unified status overview combining MAQA state and agent-assign assignments.
+Zeigt den aktuellen Status beider Extensions in einer Uebersicht.
 
-## Step 1 — Read MAQA state
+## Steps
 
-Read `.maqa/state.json`. For each feature, collect:
-- `feature_id`, `title`, `state` (todo/in_progress/in_review/done)
-- `worktree` path (if active)
-- `agent_assignments` file path (if exists)
+### Step 1: Extension Status
 
-## Step 2 — Read agent assignments per feature
-
-For each feature where `agent_assignments` file exists, read
-`.specify/features/<feature_id>/agent-assignments.yml` and collect:
-- Total task count
-- Tasks per agent (e.g. `backend-java: 4, test-writer: 2, default: 1`)
-- Validation status (passed / not run / failed)
-
-## Step 3 — Render dashboard
-
-Output the following table:
-
-```
-╔══════════════════════════════════════════════════════════════════════╗
-║           MAQA × Agent Assign — Project Status                      ║
-╠══════════════════════════════════════════════════════════════════════╣
-║ Feature          │ State       │ Agents Used          │ Tasks       ║
-╠══════════════════╪═════════════╪══════════════════════╪═════════════╣
-║ feature-id       │ in_progress │ backend-java (4)     │ 7 total     ║
-║                  │             │ test-writer (2)      │             ║
-║                  │             │ default (1)          │             ║
-╠══════════════════╪═════════════╪══════════════════════╪═════════════╣
-║ feature-id-2     │ todo        │ (not yet assigned)   │ —           ║
-╠══════════════════╪═════════════╪══════════════════════╪═════════════╣
-║ feature-id-3     │ done        │ frontend-nextjs (5)  │ 8 total     ║
-║                  │             │ test-writer (3)      │             ║
-╚══════════════════╧═════════════╧══════════════════════╧═════════════╝
+```bash
+specify extension list
 ```
 
-Also show:
-- Active worktrees (from `git worktree list`)
-- Available agent definitions (from `.claude/agents/`)
-- Next recommended action (e.g. "Run /speckit.maqa-aa.coordinator to start next batch")
+Markiere `maqa` und `agent-assign` als ✓ (installiert) oder ✗ (fehlt).
+
+### Step 2: Agent Assignments
+
+```bash
+ls .specify/agents/ 2>/dev/null || echo "Keine Agent-Files gefunden – fuehre /speckit.maqa-aa.scaffold-agents aus"
+```
+
+### Step 3: Hook Status
+
+Zeige aktive Hooks:
+
+```bash
+specify extension list --verbose 2>/dev/null || specify extension list
+```
+
+Bestaetige dass `before_specify` (install-deps) und `after_tasks` (coordinator) registriert sind.
+
+### Step 4: Summary
+
+Gib eine kompakte Zusammenfassung aus:
+
+```
+[maqa-agent-assign] Status
+  speckit.maqa:          ✓ / ✗
+  speckit.agent-assign:  ✓ / ✗
+  Agent-Files:           N gefunden
+  Hooks aktiv:           before_specify, after_tasks
+```

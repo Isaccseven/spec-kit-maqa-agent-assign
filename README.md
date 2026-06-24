@@ -1,128 +1,43 @@
-# maqa-agent-assign
+# spec-kit-maqa-agent-assign
 
-> A [spec-kit](https://github.com/github/spec-kit) extension that bridges
-> **[maqa](https://github.com/GenieRobot/spec-kit-maqa-ext)** and
-> **[agent-assign](https://github.com/xymelon/spec-kit-agent-assign)** so that
-> both work together automatically — no manual glue code required.
+> spec-kit Extension — kombiniert `speckit.maqa` und `speckit.agent-assign` mit automatischer Dependency-Installation.
 
-## What it does
+## Was diese Extension macht
 
-Without this extension, `maqa` spawns feature agents that call `/speckit.implement`
-(one flat context, no specialization). With this extension installed, every
-MAQA feature agent automatically runs:
-
-```
-/speckit.agent-assign.assign    ← assign specialists per task
-/speckit.agent-assign.validate  ← catch assignment issues early
-/speckit.agent-assign.execute   ← implement with specialized agents
-/speckit.maqa.qa                ← MAQA quality gate as usual
-```
-
-All parallelism, worktree isolation, dependency tracking, and board sync from
-`maqa` are preserved. All task-level specialization and context isolation from
-`agent-assign` are preserved. They compose cleanly.
-
-## Requirements
-
-- spec-kit `>=0.8.0`
-- [maqa](https://github.com/GenieRobot/spec-kit-maqa-ext) `>=0.3.0`
-- [agent-assign](https://github.com/xymelon/spec-kit-agent-assign) `>=1.0.0`
+- **Auto-Install**: Prueft beim ersten `/speckit.specify`-Aufruf ob `speckit.maqa` und `speckit.agent-assign` installiert sind – und installiert sie automatisch falls nicht (`before_specify`-Hook, priority 1)
+- **Auto-Assign**: Nach jedem `/speckit.tasks` wird `/speckit.agent-assign.assign` + `.validate` automatisch ausgefuehrt (`after_tasks`-Hook)
+- **Coordinator**: `/speckit.maqa-aa.coordinator` ersetzt `/speckit.maqa.coordinator` und fuehrt Agent-Assignments transparent durch
+- **Scaffold**: `/speckit.maqa-aa.scaffold-agents` erkennt deinen Stack (Java, TS, K8s, Tests) und generiert Agent-Files
+- **Status**: `/speckit.maqa-aa.status` zeigt ein unified Dashboard beider Extensions
 
 ## Installation
 
 ```bash
-# 1. Install dependencies first (if not already installed)
-specify ext add maqa
-specify ext add agent-assign --from https://github.com/xymelon/spec-kit-agent-assign/archive/refs/tags/v1.1.0.zip
+# Als lokale Dev-Extension
+specify extension add --dev ./spec-kit-maqa-agent-assign
 
-# 2. Install this bridge extension
-specify ext add https://github.com/Isaccseven/spec-kit-maqa-agent-assign/archive/refs/heads/main.zip
+# Oder direkt von GitHub
+specify extension add https://github.com/Isaccseven/spec-kit-maqa-agent-assign
 ```
 
-## Quick Start
-
-```bash
-# Step 1: Scaffold specialized agents for your tech stack (run once)
-/speckit.maqa-aa.scaffold-agents
-
-# Step 2: Run MAQA setup (if not done yet)
-/speckit.maqa.setup
-
-# Step 3: Run the combined coordinator (replaces /speckit.maqa.coordinator)
-/speckit.maqa-aa.coordinator
-
-# Check status at any time
-/speckit.maqa-aa.status
-```
-
-That's it. The coordinator handles everything else automatically.
+Die Abhaengigkeiten (`speckit.maqa`, `speckit.agent-assign`) werden beim naechsten `/speckit.specify`-Aufruf **automatisch installiert**.
 
 ## Commands
 
-| Command | Description |
+| Command | Beschreibung |
 |---|---|
-| `/speckit.maqa-aa.coordinator` | Drop-in for `/speckit.maqa.coordinator` — runs MAQA with agent-assign baked in |
-| `/speckit.maqa-aa.scaffold-agents` | Auto-generates `.claude/agents/` for your detected tech stack |
-| `/speckit.maqa-aa.status` | Unified status: MAQA feature state + agent assignments per feature |
+| `/speckit.maqa-aa.coordinator` | Haupteinstiegspunkt – ersetzt `/speckit.maqa.coordinator` |
+| `/speckit.maqa-aa.scaffold-agents` | Stack erkennen + Agent-Files generieren (einmalig) |
+| `/speckit.maqa-aa.status` | Status-Dashboard |
+| `/speckit.maqa-aa.install-deps` | Manueller Dependency-Check/Install |
 
 ## Hooks
 
-| Hook | Trigger | What it does |
+| Event | Command | Verhalten |
 |---|---|---|
-| `after_tasks` | After `/speckit.tasks` | Auto-runs `assign` + `validate` so assignments are ready before the coordinator starts |
-| `after_maqa_feature` | Inside each MAQA feature agent | Replaces `/speckit.implement` with the full agent-assign pipeline |
+| `before_specify` (priority 1) | `install-deps` | Installiert fehlende Dependencies automatisch |
+| `after_tasks` | `coordinator` | Fuehrt Agent-Assign nach Task-Generierung aus |
 
-## Full Workflow
+## Fallback
 
-```
-/speckit.constitution                →  constitution.md
-/speckit.specify                     →  spec.md
-/speckit.plan                        →  plan.md
-/speckit.tasks                       →  tasks.md
-                                        ↓ (after_tasks hook fires automatically)
-                                        agent-assignments.yml  ← NEW
-                                        validation report      ← NEW
-
-/speckit.maqa-aa.coordinator         →  SPAWN[N] feature agents (parallel worktrees)
-                                        ↓ (after_maqa_feature hook fires in each agent)
-                                        /speckit.agent-assign.execute   ← REPLACES /speckit.implement
-                                        /speckit.maqa.qa                ← unchanged
-                                        ↓
-                                        coordinator merges, re-assesses, next batch
-```
-
-## Configuration
-
-No additional configuration required beyond `maqa-config.yml` (from maqa)
-and agent definition files in `.claude/agents/` (from agent-assign).
-
-**Recommended `maqa-config.yml` settings when using this bridge:**
-
-```yaml
-# maqa-config.yml
-auto_push: true          # Recommended: prevents worktree data loss
-max_parallel: 3          # Tune to your machine / API rate limits
-qa_cadence: per_feature  # Catches regressions early
-```
-
-## How fallbacks work
-
-This extension never blocks progress:
-
-- No agent files found → all tasks use `default` (same as standard `/speckit.implement`)
-- `agent-assign.validate` fails → log warning, continue with `default` for failed tasks
-- `agent-assign.execute` errors → fall back to `/speckit.implement`, log `[maqa-agent-assign]`
-- `maqa` board companion not installed → state lives in `.maqa/state.json` as usual
-
-## Why an extension, not a preset?
-
-A preset only sets configuration values. This bridge needs to:
-1. Define new commands (`maqa-aa.coordinator`, `maqa-aa.scaffold-agents`, `maqa-aa.status`)
-2. Register hooks that fire at specific points in both extensions' lifecycles
-3. Declare explicit dependencies on both `maqa` and `agent-assign`
-
-Extensions can do all three. Presets cannot.
-
-## License
-
-MIT
+Falls eine Dependency nicht installiert werden kann, faellt die Extension lautlos auf `/speckit.implement` zurueck und loggt `[maqa-agent-assign] WARN`.
