@@ -1,0 +1,22 @@
+{
+  "name": "spec-kit-maqa-agent-assign",
+  "version": "0.0.0-semantically-released",
+  "description": "spec-kit extension bridging maqa and agent-assign",
+  "private": true,
+  "scripts": {
+    "semantic-release": "semantic-release",
+    "commitlint": "commitlint --edit"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/git": "^10.0.0",
+    "@semantic-release/github": "^10.0.0",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "semantic-release": "^24.0.0"
+  },
+  "release": {
+    "extends": "./.releaserc.json"
+  }
+}
